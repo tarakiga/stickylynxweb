@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { users } from "@/lib/schema";
-import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import { hash } from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
   try {
