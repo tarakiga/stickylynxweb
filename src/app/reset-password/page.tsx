@@ -1,8 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPageWrapper() {
+  return (
+    <Suspense>
+      <ResetPasswordPage />
+    </Suspense>
+  );
+}
+
+function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
   const [password, setPassword] = useState('');
