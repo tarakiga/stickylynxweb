@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       html: `<h1>Password Reset</h1><p>Click the link below to reset your password. This link will expire in 1 hour.</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
     });
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

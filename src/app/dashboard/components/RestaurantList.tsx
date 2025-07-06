@@ -35,7 +35,7 @@ export default function RestaurantList() {
         setRestaurants(data);
         setError(null);
       })
-      .catch(err => setError(err.message))
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Failed to fetch'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -56,8 +56,8 @@ export default function RestaurantList() {
       setRestaurants(updated);
       setModalOpen(false);
       setEditData(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save');
     } finally {
       setLoading(false);
     }
@@ -76,8 +76,8 @@ export default function RestaurantList() {
       });
       if (!res.ok) throw new Error("Failed to delete");
       setRestaurants(restaurants.filter(r => r.id !== id));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete');
     } finally {
       setLoading(false);
     }

@@ -4,10 +4,8 @@ import { authOptions } from "@/lib/authOptions";
 import { db } from "@/lib/db";
 import { restaurants } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
-import GoogleProvider from "next-auth/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     const userEmail = session?.user?.email;

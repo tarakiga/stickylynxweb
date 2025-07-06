@@ -21,8 +21,8 @@ export default function PasswordResetRequestForm() {
       if (!res.ok) throw new Error('Failed to send password reset email');
       setSuccess('If an account with that email exists, a password reset link has been sent.');
       setEmail('');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }

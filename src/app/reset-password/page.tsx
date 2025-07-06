@@ -27,8 +27,8 @@ export default function ResetPasswordPage() {
       }
       setSuccess('Your password has been reset. You can now log in.');
       setPassword('');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }

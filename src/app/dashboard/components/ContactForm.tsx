@@ -26,8 +26,8 @@ export default function ContactForm() {
       if (!res.ok) throw new Error('Failed to send message');
       setSuccess('Message sent! We will get back to you soon.');
       setForm({ name: '', email: '', message: '' });
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }

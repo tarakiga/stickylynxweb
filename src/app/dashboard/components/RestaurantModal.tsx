@@ -49,8 +49,8 @@ function useCloudinaryUpload(
       } else {
         setError("Upload failed");
       }
-    } catch (err: any) {
-      setError("Upload error");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to upload');
     } finally {
       setUploading(false);
     }

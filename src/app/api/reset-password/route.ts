@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Delete token
     await db.delete(passwordResetTokens).where(eq(passwordResetTokens.token, token));
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 
