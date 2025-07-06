@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 
-export default function UserMenu({ user }: { user: { image?: string | null; name?: string | null; email?: string | null } }) {
+export default function UserMenu({ user }: { user?: { image?: string | null; name?: string | null; email?: string | null } }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
