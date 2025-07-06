@@ -10,7 +10,7 @@ interface Restaurant {
   phone?: string;
   email?: string;
   website?: string;
-  opening_hours?: any;
+  opening_hours?: unknown;
   logo_url?: string;
   cover_image_url?: string;
 }

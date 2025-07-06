@@ -15,11 +15,11 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const res = await signIn("credentials", {
-      email: form.email,
-      password: form.password,
-      callbackUrl: "/dashboard",
-    });
+    // const res = await signIn("credentials", {
+    //   email: form.email,
+    //   password: form.password,
+    //   callbackUrl: "/dashboard",
+    // });
     setLoading(false);
   };
 

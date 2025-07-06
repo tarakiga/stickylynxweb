@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { db } from '@/lib/db';
-import { users, passwordResetTokens } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
+import { Resend } from 'resend';
+import { passwordResetTokens } from '@/lib/schema';
 import crypto from 'crypto';
 
 const resend = new Resend(process.env.RESEND_API_KEY);

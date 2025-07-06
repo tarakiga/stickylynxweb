@@ -9,7 +9,7 @@ interface RestaurantData {
   phone?: string;
   email?: string;
   website?: string;
-  opening_hours?: any;
+  opening_hours?: unknown;
   logo_url?: string;
   cover_image_url?: string;
 }
@@ -80,9 +80,9 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
   const ref = useRef<HTMLDivElement>(null);
 
   // Logo upload
-  const [logoUrl, logoUploading, logoError, setLogoFile, handleLogoChange] = useCloudinaryUpload(form.logo_url);
+  const [logoUrl, logoUploading, logoError, , handleLogoChange] = useCloudinaryUpload(form.logo_url);
   // Cover image upload
-  const [coverUrl, coverUploading, coverError, setCoverFile, handleCoverChange] = useCloudinaryUpload(form.cover_image_url);
+  const [coverUrl, coverUploading, coverError, , handleCoverChange] = useCloudinaryUpload(form.cover_image_url);
 
   useEffect(() => {
     if (open) setForm(initialData || { name: "", description: "", address: "", phone: "", email: "", website: "", opening_hours: {}, logo_url: "", cover_image_url: "" });
