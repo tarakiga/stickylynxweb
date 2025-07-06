@@ -1,0 +1,126 @@
+# **Product Requirements Document (PRD) for Stickylynx**  
+**Version:** 1.0  
+**Date:** June 24, 2025  
+**Author:** Tar Akiga 
+**Status:** Draft  
+
+---
+
+## **1. Overview**  
+### **1.1 Product Vision**  
+Stickylynx is a web-based platform that allows users to create, manage, and share curated lists of items via a single, customizable link. These lists can be used for various purposes, such as:  
+- **Restaurant & food menus**  
+- **Social media profile aggregators (for influencers)**  
+- **EPK (Electronic Press kit) for Musicians/Bands – For booking gigs, festivals, or press features, Filmmakers/Actors – To promote films or secure distribution,Authors/Speakers – For media    interviews or event bookings,Startups/Businesses – To attract investors or press coverage. 
+- **Portfolio or resource lists**  
+- **Personal link-in-bio pages**  
+
+Users can share their Sticklynx link on social media, websites, or messaging apps, making it easy for their audience to access all their important links in one place.  
+
+### **1.2 Target Audience**  
+- **Influencers & Content Creators** – To consolidate social media links.  
+- **Restaurants & Food Businesses** – To share digital menus.  
+- **Musicians & Artists** – To showcase music, merch, and tour dates.  
+- **Professionals & Freelancers** – To share portfolios, resumes, and contact info.  
+- **General Users** – For personal link collections (e.g., bookmarks, travel guides).  
+
+---
+
+## **2. Features & Requirements**  
+
+### **2.1 Core Features**  
+
+#### **2.1.1 User Dashboard**  
+- Users can sign up via email or social login (Google, Facebook, Twitter).  
+- Dashboard displays all created lists with edit/delete/share options.  
+- Analytics section to track link clicks (basic free tier, advanced in Pro).  
+
+#### **2.1.2 List Creation & Management**  
+- Users can create multiple lists (e.g., "My Socials," "Restaurant Menu").  
+- Each list supports:  
+  - **Title & Description**  
+  - **Customizable URL** (e.g., `sticklynx.com/username/mymenu`)  
+  - **Theme & Branding** (colors, fonts, logo upload)  
+  - **Items (Links, Text, Images, Videos)**  
+    - Link items (URL + title + thumbnail)  
+    - Text items (for descriptions, FAQs)  
+    - Media items (images/videos for menus or portfolios)  
+
+#### **2.1.3 Sharing & Embedding**  
+- Each list generates a unique, shareable link.  
+- Option to embed lists on websites (via iframe or widget).  
+- QR code generation for print materials (menus, business cards).  
+
+#### **2.1.4 Social Media Integration**  
+- Auto-preview when shared on Twitter, Instagram, WhatsApp, etc.  
+- One-click sharing buttons for major platforms.  
+
+#### **2.1.5 Privacy & Access Control**  
+- Public (anyone with link) vs. Private (password-protected) lists.  
+- Scheduled availability (e.g., "Happy Hour Menu" only visible 4-7 PM).  
+
+---
+
+### **2.2 Advanced Features (Future Scope)**  
+- **Collaborative Lists** – Multiple users can edit (for businesses/teams).  
+- **Custom Domains** – Users can use their own domain (e.g., `links.mybrand.com`).  
+- **API Access** – For developers to integrate with other tools.  
+- **E-commerce Links** – Direct "Buy Now" buttons for merch/ticketing.  
+
+---
+
+## **3. User Flow**  
+1. **Sign Up / Login** → Verify email → Access Dashboard.  
+2. **Create a New List** → Add items (links, text, media) → Customize design.  
+3. **Publish & Share** → Copy link or embed on website/social media.  
+4. **Track Performance** → View click analytics in dashboard.  
+
+---
+
+## **4. Technical Requirements**  
+### **4.1 Frontend**  
+- **Web App**: Responsive design (mobile/desktop).  
+- **Tech Stack**: React.js, Tailwind CSS.  
+
+### **4.2 Backend**  
+- **API**: RESTful or GraphQL.  
+- **Database, Auth, Hosting**: neon.tech. 
+url string for neon.tech: DATABASE_URL=postgresql://neondb_owner:npg_8RnxlrmBagO5@ep-sparkling-leaf-aeg8ts99-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+
+### **4.2.1 Email notification**
+- **Resend configs**
+RESEND_API_KEY=re_cNWT48T4_BZRcxaye53x7uXTQjxAT5sLw
+EMAIL_FROM=tar@tarakiga.com
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=9a61834b4eee3a3a2ca55e82d560fb562a4a8ef1899850dac0a9b7b43982ee56i  
+
+### **4.3 Third-Party Integrations**  
+- Social login (Google, Facebook, Twitter).  
+- URL metadata fetcher (for link previews).  
+- Analytics (Google Analytics, custom tracking).  
+
+---
+
+## **5. Monetization Strategy**  
+- **Freemium Model**:  
+  - **Free Tier**: Basic lists, limited themes, basic analytics.  
+  - **Pro Tier ($5-10/month)**: Custom domains, advanced analytics, priority support.  
+- **Enterprise Plans**: For businesses (custom branding, team access).  
+
+---
+
+## **6. Success Metrics**  
+- **User Growth**: # of signups/month.  
+- **Engagement**: Avg. lists per user, click-through rates.  
+- **Retention**: Monthly active users (MAU).  
+
+---
+
+## **7. Risks & Challenges**  
+- **Competition**: Existing "link-in-bio" tools (Linktree, Carrd).  
+- **User Retention**: Ensuring users keep lists updated.  
+- **Spam/Abuse**: Preventing misuse (e.g., malicious links).  
+
+---
+
+
