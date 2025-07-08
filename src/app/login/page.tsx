@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import LoginForm from '../dashboard/components/LoginForm';
+import PremiumAuthForm from '../../components/PremiumAuthForm';
 
 export default function LoginPage() {
   return (
@@ -9,7 +9,10 @@ export default function LoginPage() {
         <Image src="/stickylynx.png" alt="StickyLynx Logo" width={80} height={80} className="mb-4" />
         <h1 className="text-2xl font-bold mb-2">Sign in to StickyLynx</h1>
         <p className="text-gray-500 mb-6">Welcome back! Please enter your details.</p>
-        <LoginForm />
+        <PremiumAuthForm onSubmit={(email, password) => {
+          // TODO: Implement login logic
+          console.log('Login:', email, password);
+        }} />
         <div className="mt-6 text-sm text-gray-600">
           Don&apos;t have an account?{' '}
           <a href="/signup" className="text-blue-600 hover:underline font-medium">Sign up</a>

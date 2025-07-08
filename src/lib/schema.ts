@@ -20,8 +20,6 @@ export const restaurants = pgTable("restaurants", {
   name: varchar("name", { length: 255 }),
   description: text("description"),
   address: text("address"),
-  phone: varchar("phone", { length: 32 }),
-  email: varchar("email", { length: 255 }),
   website: varchar("website", { length: 255 }),
   opening_hours: jsonb("opening_hours"), // {day: [hours]}
   logo_url: varchar("logo_url", { length: 255 }),
@@ -29,6 +27,20 @@ export const restaurants = pgTable("restaurants", {
   is_active: boolean("is_active").default(true),
   created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
   updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
+});
+
+// NEW: Restaurant Phones Join Table
+export const restaurant_phones = pgTable('restaurant_phones', {
+  id: serial('id').primaryKey(),
+  restaurant_id: integer('restaurant_id').references(() => restaurants.id),
+  phone: varchar('phone', { length: 32 }),
+});
+
+// NEW: Restaurant Emails Join Table
+export const restaurant_emails = pgTable('restaurant_emails', {
+  id: serial('id').primaryKey(),
+  restaurant_id: integer('restaurant_id').references(() => restaurants.id),
+  email: varchar('email', { length: 255 }),
 });
 
 export const menu_categories = pgTable("menu_categories", {
@@ -48,6 +60,7 @@ export const menu_items = pgTable("menu_items", {
   name: varchar("name", { length: 255 }),
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }),
+  prices: jsonb("prices"), // array of { label, price }
   is_vegetarian: boolean("is_vegetarian").default(false),
   is_vegan: boolean("is_vegan").default(false),
   is_gluten_free: boolean("is_gluten_free").default(false),

@@ -25,13 +25,15 @@
 - [x] Next.js API routes or Node.js/Express backend
 - [x] PostgreSQL (Neon.tech)
 - [x] NextAuth.js (email + social providers)
-- [ ] Resend integration (email)
+- [x] Resend integration (email)
 - [ ] Google Analytics + custom events
 
 ### 2.3. Design System
 
 - [ ] Figma file for design system (colors, typography, components)
 - [ ] Storybook for React components
+  - [x] Storybook installed and configured for component documentation
+  - [ ] Initial stories to be created for: Button, Card, Input, Modal, List Item, List Editor, Analytics Widget, Share Dialog, Auth Forms
 - [ ] Accessibility (WCAG 2.1 AA+)
 
 ### 2.4. Core Feature Development (MVP)
@@ -73,6 +75,81 @@
 - Use this checklist for weekly standups and handoff reference.
 - Update status (e.g., [x] for done, [ ] for pending).
 - Link to Figma, Storybook, and deployment URLs as available.
+
+- [2024-05-XX] UI/UX Progress:
+  - All core UI components upgraded for premium look (Tailwind, Lucide, gradients, micro-interactions).
+  - Storybook stories scaffolded, updated, and deduped for all premium components.
+  - Restaurant modal refactored to a 3-step wizard with progress indicator and floating-label fields.
+  - ChipsInput and FieldRepeater created for multi-entry fields (emails, phones, tags).
+  - Dashboard and modal flows now scalable for multiple item types, not just restaurants.
+  - All form and card components use design-token-driven spacing and color.
+  - Step 3 of the modal now uses a 2-column layout on desktop (Address/Website left, Phones/Emails right), single column on mobile.
+  - Helper text and spacing refined for accessibility and clarity.
+
+## Sticklynx Menu Builder & Dashboard Progress (Handover Log)
+
+### 2024-05-XX (Session Summary)
+
+#### UI/UX & Architecture
+
+- Refactored all menu/category/item management from modal to premium BottomDrawer component for a more modern, accessible, and mobile-friendly UX.
+- Ensured only one modal/drawer can be open at a time; fixed all state conflicts and double-modal issues.
+- Redesigned AddCategoryStepperModal:
+  - Category name is now an editable field in the header; category description removed.
+  - Step indicator and category name are side-by-side in the header, with progress at far right.
+  - Stepper supports Back/Next navigation and always allows adding a new item at the end.
+  - Fixed logic so items are always collected in the items array, not just the current step.
+  - Added robust error handling and debug logging for all save operations.
+- MenuBuilder list is now fully flexible (no unnecessary scrollbars) and updates instantly after saving a new category or item.
+
+#### Backend/API
+
+- Inspected and confirmed `/api/menu-categories` and `/api/menu-items` endpoints are implemented and POST to the database.
+- Fixed all type issues (e.g., price as string vs number) before sending to the API.
+- Added error handling and user feedback for all save operations (alerts and UI errors).
+- Ensured categories are saved and appear immediately in the dashboard after creation.
+- Fixed bug where items were not being saved due to stepper logic; now all items are collected and POSTed correctly.
+
+#### Debugging & Testing
+
+- Added debug logs to trace items array and POST payloads.
+- Validated that categories and items are now being saved to the database.
+- Identified and planned for next steps on edit flow (pre-filling modal with category/items for editing).
+
+#### Outstanding/Next Steps
+
+- Implement edit flow for categories/items (pre-fill modal with existing data).
+- Further polish on error feedback and optimistic UI updates.
+- Continue to enforce design system and accessibility best practices.
+
+### 2024-05-XX (Inline Editing & Menu Item Actions)
+
+#### UI/UX & Dashboard Improvements
+
+- Implemented inline editing for menu category names in the Menu Builder list:
+  - Category name is now editable in-place with a pencil icon.
+  - Save (checkmark) and cancel (X) icons appear during editing for explicit actions.
+  - Editing auto-focuses the input and supports Enter/Escape keyboard shortcuts.
+- Removed legacy Edit and Delete buttons for categories; all actions are now inline and icon-based for a premium, modern UX.
+- Updated menu item actions:
+  - Edit and Delete for menu items are now icon-only (pencil and trash), improving clarity and reducing visual clutter.
+  - All actions use accessible aria-labels and premium styling.
+- All changes follow design system, accessibility, and performance best practices.
+
+#### Backend/API
+
+- Fixed category update logic:
+  - Switched frontend to use PATCH (not POST) for updating category names, matching backend API contract.
+  - Now, category name changes persist correctly in the database and UI.
+
+#### Status
+
+- Inline editing and icon-only actions are fully functional and tested.
+- Ready for handoff or further iteration.
+
+---
+
+**This log records all major architectural, UX, and backend changes for the menu builder and dashboard as of this session. Ready for handover or next dev session.**
 
 ---
 

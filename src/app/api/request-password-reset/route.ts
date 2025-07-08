@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       expiresAt,
     });
     // Send email
-    const resetUrl = `${process.env.NEXTAUTH_URL || 'https://stickylynx.netlify.app'}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL || 'https://stickylynx.online'}/reset-password?token=${token}`;
     await resend.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
       to: email,

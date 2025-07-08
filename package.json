@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:push": "dotenv -e .env.local -- npx drizzle-kit push"
+    "db:push": "dotenv -e .env.local -- npx drizzle-kit push",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
@@ -23,18 +25,30 @@
     "resend": "^4.6.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "4.0.1",
     "@eslint/eslintrc": "^3",
+    "@storybook/addon-a11y": "9.0.15",
+    "@storybook/addon-docs": "9.0.15",
+    "@storybook/addon-vitest": "9.0.15",
+    "@storybook/nextjs-vite": "^9.0.15",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.15.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "dotenv": "^17.0.1",
     "dotenv-cli": "^8.0.0",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "eslint-plugin-storybook": "9.0.15",
+    "lucide-react": "^0.525.0",
+    "playwright": "^1.53.2",
+    "storybook": "9.0.15",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

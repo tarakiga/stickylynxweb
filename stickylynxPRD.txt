@@ -123,4 +123,12 @@ NEXTAUTH_SECRET=9a61834b4eee3a3a2ca55e82d560fb562a4a8ef1899850dac0a9b7b43982ee56
 
 ---
 
+@keyframes modalIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-modalIn {
+  animation: modalIn 0.3s cubic-bezier(.4,0,.2,1) forwards;
+}
+
 

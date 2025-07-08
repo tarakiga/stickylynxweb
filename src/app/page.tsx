@@ -1,18 +1,21 @@
 import Image from "next/image";
+import HomeButtons from "../components/HomeButtons.client";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Header */}
-      <header className="w-full flex items-center justify-between px-8 py-4 border-b bg-white">
+      <header className="w-full flex items-center justify-between px-8 py-4 bg-white">
         <div className="flex items-center gap-2">
+          <Image src="/assets/icons/chain-logo.png" alt="StickyLynx Logo" width={36} height={36} className="mr-2" />
           <span className="font-bold text-xl">StickyLynx</span>
         </div>
         <nav className="flex gap-6 items-center">
           <a href="#features" className="text-gray-700 font-medium hover:underline">Features</a>
           <a href="#pricing" className="text-gray-700 font-medium hover:underline">Pricing</a>
           <a href="/contact" className="text-gray-700 font-medium hover:underline">Contact</a>
-          <a href="/dashboard" className="ml-4 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition">Get Started</a>
+          {/* CTA Button */}
+          <HomeButtons variant="header" />
         </nav>
       </header>
 
@@ -30,7 +33,8 @@ export default function Home() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-white text-center px-4">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4 drop-shadow-lg">Create Shareable List-Based Page Profiles</h1>
             <p className="mb-6 text-lg max-w-xl mx-auto drop-shadow">StickyLynx empowers you to craft versatile, shareable pages and profiles, perfect for restaurant menus, showcases, and more.</p>
-            <a href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-semibold text-lg shadow">Start Creating</a>
+            {/* Hero CTA Button */}
+            <HomeButtons variant="hero" />
           </div>
         </div>
       </section>
@@ -40,19 +44,19 @@ export default function Home() {
         <h2 className="text-2xl font-bold mb-6">Versatile Use Cases</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
           <div className="flex flex-col items-center">
-            <Image src="/usecase-restaurant.jpg" alt="Restaurant Menus" width={160} height={120} className="rounded-lg mb-2 object-cover" />
+            <Image src="/assets/images/foodMenu.png" alt="Restaurant Menus" width={160} height={120} className="rounded-lg mb-2 object-cover" />
             <span className="font-medium">Restaurant Menus</span>
           </div>
           <div className="flex flex-col items-center">
-            <Image src="/usecase-epk.jpg" alt="Electronic Press Kits" width={160} height={120} className="rounded-lg mb-2 object-cover" />
+            <Image src="/assets/images/musician.png" alt="Electronic Press Kits" width={160} height={120} className="rounded-lg mb-2 object-cover" />
             <span className="font-medium">Electronic Press Kits</span>
           </div>
           <div className="flex flex-col items-center">
-            <Image src="/usecase-profile.jpg" alt="Personal Profiles" width={160} height={120} className="rounded-lg mb-2 object-cover" />
+            <Image src="/assets/images/influencer.png" alt="Personal Profiles" width={160} height={120} className="rounded-lg mb-2 object-cover" />
             <span className="font-medium">Personal Profiles</span>
           </div>
           <div className="flex flex-col items-center">
-            <Image src="/usecase-event.jpg" alt="Event Programs" width={160} height={120} className="rounded-lg mb-2 object-cover" />
+            <Image src="/assets/images/startup.png" alt="Event Programs" width={160} height={120} className="rounded-lg mb-2 object-cover" />
             <span className="font-medium">Event Programs</span>
           </div>
         </div>
@@ -88,42 +92,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trusted by Professionals */}
-      <section className="max-w-5xl mx-auto mt-20 px-4">
-        <h2 className="text-2xl font-bold mb-6">Trusted by Professionals</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-          <div className="bg-[#1a232b] rounded-lg p-8 flex flex-col items-center justify-center">
-            <span className="text-white font-semibold text-lg mb-2">Tech Startup</span>
-            <span className="text-white text-xs">techstartup.com</span>
-          </div>
-          <div className="bg-[#b6b48f] rounded-lg p-8 flex flex-col items-center justify-center">
-            <span className="text-white font-semibold text-lg mb-2">Creative Agency</span>
-            <span className="text-white text-xs">creativeagency.com</span>
-          </div>
-          <div className="bg-[#f3e3d3] rounded-lg p-8 flex flex-col items-center justify-center">
-            <span className="text-gray-800 font-semibold text-lg mb-2">Minimal Mac & Latte</span>
-            <span className="text-gray-800 text-xs">minimalmac.com</span>
-          </div>
-          <div className="bg-[#e9d9b4] rounded-lg p-8 flex flex-col items-center justify-center">
-            <span className="text-gray-800 font-semibold text-lg mb-2">Green Synergy</span>
-            <span className="text-gray-800 text-xs">greensynergy.com</span>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="max-w-2xl mx-auto mt-20 mb-16 px-4 text-center">
         <h2 className="text-2xl font-bold mb-6">Ready to Transform Your Online Presence?</h2>
-        <a href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-semibold text-lg shadow">Get Started</a>
+        {/* CTA Button */}
+        <HomeButtons variant="cta" />
       </section>
 
       {/* Footer */}
-      <footer className="w-full border-t py-8 bg-white mt-auto">
+      <footer className="w-full py-8 bg-white mt-auto">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 px-4">
           <div className="flex gap-6 text-gray-500 text-sm">
             <a href="#about" className="hover:underline">About</a>
-            <a href="#tos" className="hover:underline">Terms of Service</a>
-            <a href="#privacy" className="hover:underline">Privacy Policy</a>
+            <a href="/terms-and-conditions" className="hover:underline">Terms & Conditions</a>
+            <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
             <a href="/contact" className="hover:underline">Contact Us</a>
           </div>
           <div className="flex gap-4 text-gray-400">
