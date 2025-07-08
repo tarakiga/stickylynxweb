@@ -8,11 +8,32 @@ import FieldRepeater from '../../../components/FieldRepeater';
 import BottomDrawer from "./BottomDrawer";
 import { Check, X, Pencil, Trash2 } from 'lucide-react';
 
-function AddCategoryStepperModal({ isOpen, onClose, onSave, restaurantId, onCategorySaved }: { isOpen: boolean, onClose: () => void, onSave: (cat: any, items: any[]) => void, restaurantId: number, onCategorySaved?: () => void }) {
+// Types for menu builder
+export interface MenuItemPrice {
+  label: string;
+  price: string | number;
+}
+
+export interface MenuItem {
+  id?: number;
+  name: string;
+  description?: string;
+  prices: MenuItemPrice[];
+  category_id?: number;
+}
+
+export interface MenuCategory {
+  id?: number;
+  name: string;
+  description?: string;
+  restaurant_id?: number;
+}
+
+function AddCategoryStepperModal({ isOpen, onClose, onSave, restaurantId, onCategorySaved }: { isOpen: boolean, onClose: () => void, onSave: (cat: MenuCategory, items: MenuItem[]) => void, restaurantId: number, onCategorySaved?: () => void }) {
   const [categoryName, setCategoryName] = useState('');
   const [categoryDesc, setCategoryDesc] = useState('');
-  const [items, setItems] = useState<any[]>([]);
-  const [currentItem, setCurrentItem] = useState<any>({ name: '', description: '', prices: [{ label: '', price: '' }] });
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [currentItem, setCurrentItem] = useState<MenuItem>({ name: '', description: '', prices: [{ label: '', price: '' }] });
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [itemError, setItemError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -38,7 +59,7 @@ function AddCategoryStepperModal({ isOpen, onClose, onSave, restaurantId, onCate
       setItemError('Item name is required.');
       return false;
     }
-    if (!currentItem.prices || !currentItem.prices.length || currentItem.prices.some((p: any) => !p.label.trim() || !p.price)) {
+    if (!currentItem.prices || !currentItem.prices.length || currentItem.prices.some((p: MenuItemPrice) => !p.label.trim() || !p.price)) {
       setItemError('Each item must have at least one price with label and value.');
       return false;
     }
@@ -116,30 +137,30 @@ function AddCategoryStepperModal({ isOpen, onClose, onSave, restaurantId, onCate
       <div className="flex flex-col gap-6 min-w-[400px] max-w-2xl">
         <form ref={formRef} className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={e => { e.preventDefault(); handleAddItem(); }}>
           <div className="flex flex-col gap-4">
-            <PremiumInput label="Item Name" value={currentItem.name} onChange={e => setCurrentItem((i: any) => ({ ...i, name: e.target.value }))} required />
-            <PremiumTextArea label="Description" value={currentItem.description} onChange={e => setCurrentItem((i: any) => ({ ...i, description: e.target.value }))} />
+            <PremiumInput label="Item Name" value={currentItem.name} onChange={e => setCurrentItem((i) => ({ ...i, name: e.target.value }))} required />
+            <PremiumTextArea label="Description" value={currentItem.description} onChange={e => setCurrentItem((i) => ({ ...i, description: e.target.value }))} />
           </div>
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Prices (add one or more)</label>
-            {(currentItem.prices || []).map((p: any, idx: number) => (
+            {(currentItem.prices || []).map((p: MenuItemPrice, idx: number) => (
               <div key={idx} className="flex gap-2 items-center">
                 <PremiumInput label={idx === 0 ? 'Option' : ''} value={p.label || ''} onChange={e => {
                   const next = [...(currentItem.prices || [])];
                   next[idx] = { ...next[idx], label: e.target.value };
-                  setCurrentItem((i: any) => ({ ...i, prices: next }));
+                  setCurrentItem((i) => ({ ...i, prices: next }));
                 }} placeholder="e.g. Small, Medium, Large" />
                 <PremiumInput label={idx === 0 ? 'Price' : ''} type="number" value={p.price || ''} onChange={e => {
                   const next = [...(currentItem.prices || [])];
                   next[idx] = { ...next[idx], price: e.target.value };
-                  setCurrentItem((i: any) => ({ ...i, prices: next }));
+                  setCurrentItem((i) => ({ ...i, prices: next }));
                 }} placeholder="Price" />
                 <button type="button" className="text-red-500 px-2 py-1 rounded hover:bg-red-50" onClick={() => {
-                  setCurrentItem((i: any) => ({ ...i, prices: (i.prices || []).filter((_: any, i2: number) => i2 !== idx) }));
+                  setCurrentItem((i) => ({ ...i, prices: (i.prices || []).filter((_: MenuItemPrice, i2: number) => i2 !== idx) }));
                 }} aria-label="Remove price option" disabled={(currentItem.prices || []).length === 1}>&minus;</button>
               </div>
             ))}
             <button type="button" className="text-yellow-600 px-2 py-1 rounded hover:bg-yellow-50 w-fit mt-1" onClick={() => {
-              setCurrentItem((i: any) => ({ ...i, prices: [...(i?.prices || []), { label: '', price: '' }] }));
+              setCurrentItem((i) => ({ ...i, prices: [...(i?.prices || []), { label: '', price: '' }] }));
             }} aria-label="Add price option">+ Add Price Option</button>
           </div>
           {itemError && <div className="col-span-2 text-red-600 text-sm">{itemError}</div>}
@@ -167,10 +188,10 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
   restaurantId: number,
   onAddCategory: () => void,
   onAddItem: (catId: number) => void,
-  onEditItem: (item: any, catId: number) => void
+  onEditItem: (item: MenuItem, catId: number) => void
 }) {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [items, setItems] = useState<any[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -200,7 +221,7 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
   }, [restaurantId]);
 
   // Filter items by category
-  const getItemsForCategory = (catId: number) => items.filter((i: any) => i.category_id === catId);
+  const getItemsForCategory = (catId: number) => items.filter((i) => i.category_id === catId);
 
   // Delete Category
   const handleCatDelete = async (catId: number) => {
@@ -226,7 +247,7 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
   };
 
   // Add/Edit Category (with validation)
-  const handleCatSave = async (cat: any, items: any[]) => {
+  const handleCatSave = async (cat: MenuCategory, items: MenuItem[]) => {
     setSaveError(null);
     try {
       // Save category first
@@ -245,7 +266,7 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
       // Save items for this category
       for (const item of items) {
         // Sanitize prices: ensure price is a number
-        const sanitizedPrices = (item.prices || []).map((p: any) => ({
+        const sanitizedPrices = (item.prices || []).map((p: MenuItemPrice) => ({
           label: p.label,
           price: Number(p.price),
         }));
@@ -277,13 +298,13 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
     const trimmed = tempCatName.trim();
     if (!trimmed) return;
     // Optimistically update UI
-    setCategories(cats => cats.map(c => c.id === catId ? { ...c, name: trimmed } : c));
+    setCategories(cats => cats.map(c => (c.id ?? -1) === (catId ?? -1) ? { ...c, name: trimmed } : c));
     setEditingCatId(null);
     // Persist to backend
     await fetch('/api/menu-categories', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: catId, name: trimmed }),
+      body: JSON.stringify({ id: catId ?? -1, name: trimmed }),
     });
     refetchMenuData();
   };
@@ -312,14 +333,14 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                             ref={inputRef}
                             onKeyDown={e => {
                               if (e.key === 'Escape') { setEditingCatId(null); setTempCatName(''); }
-                              if (e.key === 'Enter') { handleCatNameSave(cat.id); }
+                              if (e.key === 'Enter') { handleCatNameSave(cat.id ?? -1); }
                             }}
                           />
                           <button
                             type="button"
                             aria-label="Save category name"
                             className="p-1 rounded hover:bg-green-100 transition ml-1"
-                            onClick={() => handleCatNameSave(cat.id)}
+                            onClick={() => handleCatNameSave(cat.id ?? -1)}
                           >
                             <Check size={20} className="text-green-600" />
                           </button>
@@ -339,7 +360,7 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                             type="button"
                             aria-label="Edit category name"
                             className="p-1 rounded hover:bg-yellow-100 transition"
-                            onClick={() => { setEditingCatId(cat.id); setTempCatName(cat.name); setTimeout(() => { inputRef.current?.focus(); inputRef.current?.select(); }, 0); }}
+                            onClick={() => { setEditingCatId(cat.id ?? -1); setTempCatName(cat.name); setTimeout(() => { inputRef.current?.focus(); inputRef.current?.select(); }, 0); }}
                           >
                             <Pencil size={18} className="text-yellow-600" />
                           </button>
@@ -349,19 +370,17 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                   </div>
                   <div className="text-gray-500 text-sm mb-2">{cat.description}</div>
                   <div className="space-y-2">
-                    {getItemsForCategory(cat.id).map(item => (
-                      <div key={item.id} className="bg-gray-50 rounded p-3 flex justify-between items-center">
+                    {getItemsForCategory(cat.id ?? -1).map(item => (
+                      <div key={item.id ?? Math.random()} className="bg-gray-50 rounded p-3 flex justify-between items-center">
                         <div>
                           <div className="font-medium text-gray-900">{item.name}</div>
                           <div className="text-xs text-gray-500">{item.description}</div>
-                          {item.prices ? (
+                          {item.prices && item.prices.length > 0 && (
                             <div className="flex gap-2 mt-1">
-                              {item.prices.map((p: any, idx: number) => (
+                              {item.prices.map((p: MenuItemPrice, idx: number) => (
                                 <span key={idx} className="bg-yellow-100 text-yellow-800 rounded px-2 py-0.5 text-xs">{p.label}: ${p.price}</span>
                               ))}
                             </div>
-                          ) : (
-                            <div className="text-xs text-blue-700 mt-1">${item.price}</div>
                           )}
                         </div>
                         <div className="flex gap-2 ml-2">
@@ -369,7 +388,7 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                             type="button"
                             aria-label="Edit item"
                             className="p-2 rounded-lg hover:bg-yellow-100 transition"
-                            onClick={() => onEditItem(item, cat.id)}
+                            onClick={() => onEditItem(item, cat.id ?? -1)}
                           >
                             <Pencil size={18} className="text-yellow-600" />
                           </button>
@@ -377,14 +396,14 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                             type="button"
                             aria-label="Delete item"
                             className="p-2 rounded-lg hover:bg-red-100 transition"
-                            onClick={() => handleItemDelete(item.id)}
+                            onClick={() => handleItemDelete(item.id ?? -1)}
                           >
                             <Trash2 size={18} className="text-red-500" />
                           </button>
                         </div>
                       </div>
                     ))}
-                    <PremiumButton variant="primary" className="mt-2" onClick={() => onAddItem(cat.id)}>+ Add Item</PremiumButton>
+                    <PremiumButton variant="primary" className="mt-2" onClick={() => onAddItem(cat.id ?? -1)}>+ Add Item</PremiumButton>
                   </div>
                 </div>
               ))}

@@ -164,3 +164,39 @@
 ---
 
 **This workplan is living documentation. Update as requirements evolve.**
+
+## [DATE] Type Safety & Linting Improvements
+
+- **TypeScript Strictness:**
+  - Replaced all `any` types in `MenuBuilder.tsx`, `RestaurantList.tsx`, and `RestaurantModal.tsx` with explicit interfaces:
+    - `MenuItem`, `MenuItemPrice`, `MenuCategory` now used throughout.
+  - Updated all state hooks and function signatures to use these types (no more `any` in menu/category/item logic).
+  - All handlers and callbacks (e.g., `onEditItem`, `onSave`, etc.) now use strong types.
+
+- **Component Metadata:**
+  - Added `displayName` to `PremiumInput` to resolve missing display name warning for React DevTools and linting.
+
+- **Lint/Build Cleanliness:**
+  - Fixed all linter errors related to type safety, function typing, and prop usage.
+  - Ensured all `.id` and `.category_id` usages are guarded or have fallback values to prevent `undefined` errors.
+  - No remaining `any` type or missing `displayName` warnings in the codebase.
+
+- **Best Practices:**
+  - All changes follow project conventions for premium, accessible, and maintainable code.
+
+**Next Steps:**
+
+- Review for any further runtime validation or stricter type needs.
+- Continue to enforce strong typing for all new features.
+
+---
+
+## [DATE] Image Loader Fix
+
+- **Next.js Image Optimization:**
+  - Updated `next.config.ts` to add `'res.cloudinary.com'` to `images.domains`.
+  - This resolves `<Image />` loader errors for Cloudinary-hosted images in `PremiumCardList` and `RestaurantList`.
+  - Local images (starting with `/`) continue to work as before.
+  - If new remote image domains are used in the future, add them to `images.domains` for compatibility.
+
+---

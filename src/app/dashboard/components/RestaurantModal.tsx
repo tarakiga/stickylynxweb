@@ -95,7 +95,7 @@ function createSyntheticFileEvent(file: File): React.ChangeEvent<HTMLInputElemen
     defaultPrevented: false,
     eventPhase: 0,
     isTrusted: true,
-    nativeEvent: {} as any,
+    nativeEvent: {} as unknown,
     preventDefault: () => {},
     isDefaultPrevented: () => false,
     stopPropagation: () => {},

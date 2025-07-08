@@ -1,14 +1,16 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Link2, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 const PremiumListItem = ({ type, content, url, thumbnail }: { type: 'link' | 'text' | 'media'; content: string; url?: string; thumbnail?: string }) => {
   if (type === 'link') {
     return (
       <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group border-b border-gray-100">
-        {thumbnail ? (
-          <img src={thumbnail} alt="thumb" className="w-10 h-10 rounded-full object-cover shadow-sm" />
-        ) : (
+        {thumbnail && (
+          <Image src={thumbnail} alt="thumb" width={40} height={40} className="w-10 h-10 rounded-full object-cover shadow-sm" />
+        )}
+        {!thumbnail && (
           <span className="w-10 h-10 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-700"><Link2 size={18} /></span>
         )}
         <a href={url} className="text-info underline font-medium group-hover:text-yellow-600 transition">{content}</a>
@@ -18,9 +20,10 @@ const PremiumListItem = ({ type, content, url, thumbnail }: { type: 'link' | 'te
   if (type === 'media') {
     return (
       <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition border-b border-gray-100">
-        {thumbnail ? (
-          <img src={thumbnail} alt="media" className="w-14 h-14 rounded-xl object-cover shadow" />
-        ) : (
+        {thumbnail && (
+          <Image src={thumbnail} alt="media" width={56} height={56} className="w-14 h-14 rounded-xl object-cover shadow" />
+        )}
+        {!thumbnail && (
           <span className="w-14 h-14 flex items-center justify-center rounded-xl bg-blue-100 text-blue-700"><ImageIcon size={22} /></span>
         )}
         <span className="font-medium text-gray-800">{content}</span>

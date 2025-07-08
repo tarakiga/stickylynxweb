@@ -1,13 +1,15 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import Image from 'next/image';
 
 const PremiumUserAvatar = ({ src, name, online }: { src?: string; name: string; online?: boolean }) => {
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   return (
     <div className="relative inline-block font-[Asap]">
-      {src ? (
-        <img src={src} alt={name} className="w-14 h-14 rounded-full object-cover shadow border-2 border-white" />
-      ) : (
+      {src && (
+        <Image src={src} alt={name} width={56} height={56} className="w-14 h-14 rounded-full object-cover shadow border-2 border-white" />
+      )}
+      {!src && (
         <span className="w-14 h-14 flex items-center justify-center rounded-full bg-yellow-200 text-yellow-800 text-xl font-bold shadow border-2 border-white">
           {initials}
         </span>

@@ -1,30 +1,36 @@
 import React from 'react';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
-// Support both button and anchor props
-export type PremiumButtonProps =
-  | (React.ButtonHTMLAttributes<HTMLButtonElement> & {
-      as?: 'button';
-      variant?: 'primary' | 'secondary' | 'danger';
-      icon?: React.ReactNode;
-      loading?: boolean;
-    })
-  | (React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-      as: 'a';
-      variant?: 'primary' | 'secondary' | 'danger';
-      icon?: React.ReactNode;
-      loading?: boolean;
-    });
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  as?: 'button';
+  variant?: 'primary' | 'secondary' | 'danger';
+  icon?: React.ReactNode;
+  loading?: boolean;
+};
 
-export const PremiumButton: React.FC<PremiumButtonProps> = ({
-  children,
-  variant = 'primary',
-  icon,
-  loading = false,
-  disabled = false,
-  as = 'button',
-  ...props
-}: any) => {
+type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  as: 'a';
+  variant?: 'primary' | 'secondary' | 'danger';
+  icon?: React.ReactNode;
+  loading?: boolean;
+};
+
+type PremiumButtonProps = ButtonProps | AnchorProps;
+
+function isAnchorProps(props: PremiumButtonProps): props is AnchorProps {
+  return props.as === 'a';
+}
+
+export const PremiumButton: React.FC<PremiumButtonProps> = (props) => {
+  const {
+    children,
+    variant = 'primary',
+    icon,
+    loading = false,
+    as = 'button',
+    ...rest
+  } = props;
+
   const base =
     'relative inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl font-semibold text-lg shadow-lg transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-offset-2';
   const variants: Record<string, string> = {
@@ -36,27 +42,29 @@ export const PremiumButton: React.FC<PremiumButtonProps> = ({
       'bg-gradient-to-br from-red-600 to-red-400 text-white hover:from-red-700 hover:to-red-500 focus:ring-red-400/60',
   };
   const state =
-    disabled || loading
+    ('disabled' in props && props.disabled) || loading
       ? 'opacity-60 cursor-not-allowed pointer-events-none'
       : 'cursor-pointer hover:scale-105 active:scale-95';
 
-  // Only pass 'disabled' if rendering a button
-  const extraProps = as === 'button' ? { disabled: disabled || loading } : {};
-
+  if (isAnchorProps(props)) {
+    // Anchor
+    return (
+      <a className={`${base} ${variants[variant]} ${state}`} {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+        {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : icon && <span className="-ml-1">{icon}</span>}
+        {children}
+      </a>
+    );
+  }
+  // Button
   return (
-    <>
-      {as === 'a' ? (
-        <a className={`${base} ${variants[variant]} ${state}`} {...props}>
-          {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : icon && <span className="-ml-1">{icon}</span>}
-          {children}
-        </a>
-      ) : (
-        <button className={`${base} ${variants[variant]} ${state}`} {...extraProps} {...props}>
-          {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : icon && <span className="-ml-1">{icon}</span>}
-          {children}
-        </button>
-      )}
-    </>
+    <button
+      className={`${base} ${variants[variant]} ${state}`}
+      disabled={('disabled' in props && props.disabled) || loading}
+      {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+    >
+      {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : icon && <span className="-ml-1">{icon}</span>}
+      {children}
+    </button>
   );
 };
 

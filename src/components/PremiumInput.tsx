@@ -64,4 +64,7 @@ export const PremiumInput = forwardRef<HTMLInputElement, PremiumInputProps>(
   }
 );
 
+// @ts-ignore
+PremiumInput.displayName = "PremiumInput";
+
 export default PremiumInput;

@@ -23,6 +23,27 @@ export interface Restaurant {
   cover_image_url?: string;
 }
 
+// Types for menu items and categories
+export interface MenuItemPrice {
+  label: string;
+  price: string | number;
+}
+
+export interface MenuItem {
+  id?: number;
+  name: string;
+  description?: string;
+  prices: MenuItemPrice[];
+  category_id?: number;
+}
+
+export interface MenuCategory {
+  id?: number;
+  name: string;
+  description?: string;
+  restaurant_id?: number;
+}
+
 const PremiumCard = ({ header, logoUrl, children }: { header: string; logoUrl?: string; children: React.ReactNode }) => (
   <div className="card rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-shadow duration-200 bg-white">
     <div
@@ -61,7 +82,7 @@ export default function RestaurantList() {
   const [menuModalRestaurant, setMenuModalRestaurant] = useState<Restaurant | null>(null);
   const [menuStatus, setMenuStatus] = useState<Record<number, boolean>>({}); // restaurantId -> hasMenu
   const [itemModalOpen, setItemModalOpen] = useState(false);
-  const [itemModalData, setItemModalData] = useState<any | null>(null);
+  const [itemModalData, setItemModalData] = useState<MenuItem | null>(null);
   const [itemModalCatId, setItemModalCatId] = useState<number | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Restaurant | null>(null);
@@ -217,7 +238,7 @@ export default function RestaurantList() {
   };
 
   // Implement handleCatSave with error handling
-  const handleCatSave = async (cat: any, items: any[]) => {
+  const handleCatSave = async (cat: MenuCategory, items: MenuItem[]) => {
     try {
       // Save category first
       const res = await fetch('/api/menu-categories', {
@@ -235,7 +256,7 @@ export default function RestaurantList() {
       console.log('Saving items:', items);
       for (const item of items) {
         // Convert all price values in prices to numbers
-        const fixedPrices = (item.prices || []).map((p: any) => ({
+        const fixedPrices = (item.prices || []).map((p: MenuItemPrice) => ({
           ...p,
           price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
         }));
@@ -374,7 +395,7 @@ export default function RestaurantList() {
               setCategoryModalOpen(false);
               setCategoryModalRestaurantId(null);
             }}
-            onEditItem={(item: any, catId: number) => {
+            onEditItem={(item: MenuItem, catId: number) => {
               setItemModalOpen(true);
               setItemModalData(item);
               setItemModalCatId(catId);

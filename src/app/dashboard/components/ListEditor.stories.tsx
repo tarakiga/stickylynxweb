@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { GripVertical, Plus } from 'lucide-react';
+import Image from 'next/image';
 
 const PremiumListEditor = ({ items }: { items: { type: 'link' | 'text' | 'media'; content: string; url?: string; thumbnail?: string }[] }) => (
   <div className="card rounded-2xl shadow-lg border border-gray-100 bg-white p-6">
@@ -13,7 +14,9 @@ const PremiumListEditor = ({ items }: { items: { type: 'link' | 'text' | 'media'
           <GripVertical size={16} className="text-gray-300 cursor-pointer" />
           {item.type === 'link' && <a href={item.url} className="text-info underline font-medium">{item.content}</a>}
           {item.type === 'text' && <span className="text-gray-700">{item.content}</span>}
-          {item.type === 'media' && <img src={item.thumbnail} alt="media" className="w-12 h-12 rounded-xl object-cover shadow" />}
+          {item.type === 'media' && item.thumbnail && (
+            <Image src={item.thumbnail} alt="media" width={48} height={48} className="w-12 h-12 rounded-xl object-cover shadow" />
+          )}
         </li>
       ))}
     </ul>

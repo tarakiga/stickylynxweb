@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 export type PremiumUserAvatarProps = {
   src?: string;
@@ -11,7 +12,7 @@ export const PremiumUserAvatar: React.FC<PremiumUserAvatarProps> = ({ src, name,
   return (
     <div className="relative inline-block font-[Asap]">
       {src ? (
-        <img src={src} alt={name} className="w-14 h-14 rounded-full object-cover shadow border-2 border-white" />
+        <Image src={src} alt={name} width={56} height={56} className="w-14 h-14 rounded-full object-cover shadow border-2 border-white" />
       ) : (
         <span className="w-14 h-14 flex items-center justify-center rounded-full bg-yellow-200 text-yellow-800 text-xl font-bold shadow border-2 border-white">
           {initials}

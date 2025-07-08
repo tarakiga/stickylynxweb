@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { UploadCloud } from 'lucide-react';
+import Image from 'next/image';
 
 export interface PremiumImageDropzoneProps {
   disabled?: boolean;
@@ -42,7 +43,7 @@ const PremiumImageDropzone: React.FC<PremiumImageDropzoneProps> = ({ disabled = 
       aria-disabled={disabled}
     >
       {preview ? (
-        <img src={preview} alt="Preview" className="w-20 h-20 object-cover rounded-xl shadow mr-4" />
+        <Image src={preview} alt="Preview" width={80} height={80} className="w-20 h-20 object-cover rounded-xl shadow mr-4" />
       ) : (
         <UploadCloud size={28} className="text-yellow-400 mr-3 flex-shrink-0" />
       )}
