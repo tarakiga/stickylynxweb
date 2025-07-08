@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Link2, Image as ImageIcon } from 'lucide-react';
 
 const PremiumListItem = ({ type, content, url, thumbnail }: { type: 'link' | 'text' | 'media'; content: string; url?: string; thumbnail?: string }) => {

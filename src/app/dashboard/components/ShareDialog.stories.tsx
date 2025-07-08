@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Copy, Check, Twitter, Facebook, MessageCircle } from 'lucide-react';
 
 const PremiumShareDialog = ({ link }: { link: string }) => {

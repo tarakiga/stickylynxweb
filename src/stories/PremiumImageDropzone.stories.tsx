@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import PremiumImageDropzone from '../components/PremiumImageDropzone';
 
 const meta: Meta<typeof PremiumImageDropzone> = {

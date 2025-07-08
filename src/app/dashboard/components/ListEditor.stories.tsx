@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { GripVertical, Plus } from 'lucide-react';
 
 const PremiumListEditor = ({ items }: { items: { type: 'link' | 'text' | 'media'; content: string; url?: string; thumbnail?: string }[] }) => (

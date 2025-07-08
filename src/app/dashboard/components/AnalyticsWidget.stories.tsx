@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { BarChart2 } from 'lucide-react';
 
 const PremiumAnalyticsWidget = ({ clicks, views }: { clicks: number; views: number }) => (

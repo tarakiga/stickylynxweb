@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pencil, Trash2, PlusCircle, Eye, EyeOff } from 'lucide-react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const PremiumCardList = ({ logo, name, onEdit, onDelete, onCreate, onView, onPreview }: {
   logo: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
 const PremiumButton = ({ children, variant = 'primary', icon, loading, disabled, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'danger'; icon?: React.ReactNode; loading?: boolean }) => {

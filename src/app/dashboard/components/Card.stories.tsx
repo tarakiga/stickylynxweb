@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { LayoutGrid, Pencil, Trash2, PlusCircle, Eye, EyeOff } from 'lucide-react';
 
 const PremiumCard = ({ header, children }: { header: string; children: React.ReactNode }) => (
