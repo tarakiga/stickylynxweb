@@ -34,15 +34,6 @@ interface RestaurantModalProps {
 const CLOUDINARY_CLOUD_NAME = "dqyiibusv";
 const CLOUDINARY_UPLOAD_PRESET = "sticky";
 
-function useCloudinaryUpload(
-  initialUrl?: string
-): [string | undefined, boolean] {
-  const [url, setUrl] = useState<string | undefined>(initialUrl);
-  const [uploading, setUploading] = useState(false);
-
-  return [url, uploading];
-}
-
 export default function RestaurantModal({ open, onClose, onSave, initialData, mode }: RestaurantModalProps) {
   const [submitting, setSubmitting] = useState(false);
   const normalize = (data?: RestaurantData): RestaurantData => ({
@@ -57,11 +48,11 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
   const ref = useRef<HTMLDivElement>(null);
 
   // Logo upload
-  const [, logoUploading] = useCloudinaryUpload(form.logo_url);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
 
   // Cover image upload
-  const [, coverUploading] = useCloudinaryUpload(form.cover_image_url);
+  const [coverUploading, setCoverUploading] = useState(false);
   const [coverError, setCoverError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -88,51 +79,49 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
 
   const handleLogoChange = async (file: File) => {
     setLogoError(null);
+    setLogoUploading(true);
     try {
-      await uploadLogo(file);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.secure_url) {
+        setForm(prev => ({ ...prev, logo_url: data.secure_url }));
+      } else {
+        throw new Error('No URL returned');
+      }
     } catch {
       setLogoError('Failed to upload logo. Please try again.');
-    }
-  };
-
-  const uploadLogo = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.secure_url) {
-      setForm(prev => ({ ...prev, logo_url: data.secure_url }));
-    } else {
-      throw new Error('No URL returned');
+    } finally {
+      setLogoUploading(false);
     }
   };
 
   const handleCoverChange = async (file: File) => {
     setCoverError(null);
+    setCoverUploading(true);
     try {
-      await uploadCover(file);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.secure_url) {
+        setForm(prev => ({ ...prev, cover_image_url: data.secure_url }));
+      } else {
+        throw new Error('No URL returned');
+      }
     } catch {
       setCoverError('Failed to upload cover image. Please try again.');
-    }
-  };
-
-  const uploadCover = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.secure_url) {
-      setForm(prev => ({ ...prev, cover_image_url: data.secure_url }));
-    } else {
-      throw new Error('No URL returned');
+    } finally {
+      setCoverUploading(false);
     }
   };
 
