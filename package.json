@@ -26,7 +26,8 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "resend": "^4.6.0"
+    "resend": "^4.6.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "4.0.1",
