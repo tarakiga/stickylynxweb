@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 
 export default function TermsAndConditions() {
   return (
@@ -38,7 +37,7 @@ export default function TermsAndConditions() {
         </ul>
         <h2 className="text-xl font-semibold mt-8 mb-2">Limitation of Liability</h2>
         <ul className="list-disc pl-6 mb-4">
-          <li>StickyLynx is provided "as is" without warranties of any kind.</li>
+          <li>StickyLynx is provided &quot;as is&quot; without warranties of any kind.</li>
           <li>We are not liable for any damages arising from your use of the platform.</li>
         </ul>
         <h2 className="text-xl font-semibold mt-8 mb-2">Changes to Terms</h2>

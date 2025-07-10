@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 
 export default function PrivacyPolicy() {
   return (
@@ -19,7 +18,7 @@ export default function PrivacyPolicy() {
       <main className="max-w-2xl mx-auto py-16 px-4 text-gray-800 flex-1 w-full">
         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
         <p className="mb-4">Last updated: June 2024</p>
-        <p className="mb-4">StickyLynx ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website and services.</p>
+        <p className="mb-4">StickyLynx (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website and services.</p>
         <h2 className="text-xl font-semibold mt-8 mb-2">Information We Collect</h2>
         <ul className="list-disc pl-6 mb-4">
           <li><b>Personal Information:</b> When you sign up or contact us, we may collect your name, email address, and other relevant details.</li>

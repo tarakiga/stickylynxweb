@@ -1,11 +1,8 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/authOptions";
-import Image from "next/image";
-import RestaurantList from "./components/RestaurantList";
 import UserMenu from "./components/UserMenu";
 import PremiumUserAvatar from '../../components/PremiumUserAvatar';
-import PremiumAnalyticsWidget from '../../components/PremiumAnalyticsWidget';
 import DashboardTabs from "./components/DashboardTabs";
 
 export default async function DashboardPage() {

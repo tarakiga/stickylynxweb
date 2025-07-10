@@ -1,13 +1,11 @@
 "use client";
-import { useState, useEffect, useRef, ChangeEvent, DragEvent } from "react";
+import { useState, useEffect, useRef } from "react";
 import PremiumModal from '@/components/PremiumModal';
 import PremiumInput from '../../../components/PremiumInput';
 import PremiumTextArea from '@/components/PremiumTextArea';
 import PremiumImageDropzone from '@/components/PremiumImageDropzone';
 import PremiumButton from '../../../components/PremiumButton';
 import ChipsInput from '@/components/ChipsInput';
-import { useState as useReactState } from "react";
-import MenuBuilder from './MenuBuilder';
 import type { Restaurant } from "./RestaurantList";
 
 interface RestaurantData {
@@ -38,76 +36,15 @@ const CLOUDINARY_UPLOAD_PRESET = "sticky";
 
 function useCloudinaryUpload(
   initialUrl?: string
-): [string | undefined, boolean, string | null, (file: File) => void, (e: ChangeEvent<HTMLInputElement> | DragEvent<HTMLDivElement>) => void] {
+): [string | undefined, boolean] {
   const [url, setUrl] = useState<string | undefined>(initialUrl);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const uploadToCloudinary = async (file: File) => {
-    setUploading(true);
-    setError(null);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.secure_url) {
-        setUrl(data.secure_url);
-      } else {
-        setError("Upload failed");
-      }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to upload');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleFile = (file: File) => {
-    uploadToCloudinary(file);
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement> | DragEvent<HTMLDivElement>) => {
-    let file: File | undefined;
-    if ("dataTransfer" in e && e.dataTransfer?.files?.[0]) {
-      file = e.dataTransfer.files[0];
-    } else if ("target" in e && (e.target as HTMLInputElement).files?.[0]) {
-      file = (e.target as HTMLInputElement).files![0];
-    }
-    if (file) handleFile(file);
-  };
-
-  return [url, uploading, error, handleFile, handleChange];
-}
-
-// Utility to create a synthetic ChangeEvent for file input
-function createSyntheticFileEvent(file: File): React.ChangeEvent<HTMLInputElement> {
-  return {
-    target: { files: [file] } as unknown as HTMLInputElement,
-    // The following are required for type compatibility but are not used by the upload hook
-    currentTarget: {} as HTMLInputElement,
-    bubbles: false,
-    cancelable: false,
-    defaultPrevented: false,
-    eventPhase: 0,
-    isTrusted: true,
-    nativeEvent: {} as unknown,
-    preventDefault: () => {},
-    isDefaultPrevented: () => false,
-    stopPropagation: () => {},
-    isPropagationStopped: () => false,
-    persist: () => {},
-    timeStamp: Date.now(),
-    type: 'change',
-  } as React.ChangeEvent<HTMLInputElement>;
+  return [url, uploading];
 }
 
 export default function RestaurantModal({ open, onClose, onSave, initialData, mode }: RestaurantModalProps) {
-  const [submitting, setSubmitting] = useReactState(false);
+  const [submitting, setSubmitting] = useState(false);
   const normalize = (data?: RestaurantData): RestaurantData => ({
     ...data,
     name: data?.name ?? '',
@@ -120,9 +57,12 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
   const ref = useRef<HTMLDivElement>(null);
 
   // Logo upload
-  const [, logoUploading, logoError, , handleLogoChangeRaw] = useCloudinaryUpload();
+  const [, logoUploading] = useCloudinaryUpload(form.logo_url);
+  const [logoError, setLogoError] = useState<string | null>(null);
+
   // Cover image upload
-  const [, coverUploading, coverError, , handleCoverChangeRaw] = useCloudinaryUpload();
+  const [, coverUploading] = useCloudinaryUpload(form.cover_image_url);
+  const [coverError, setCoverError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -137,56 +77,6 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
     }
   }, [open]);
 
-  // Directly update form state on upload
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement> | DragEvent<HTMLDivElement> | File) => {
-    const file = (e instanceof File)
-      ? e
-      : 'dataTransfer' in e && e.dataTransfer?.files?.[0]
-        ? e.dataTransfer.files[0]
-        : 'target' in e && (e.target as HTMLInputElement).files?.[0]
-          ? (e.target as HTMLInputElement).files![0]
-          : undefined;
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-      fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: formData,
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.secure_url) {
-            setForm(f => ({ ...f, logo_url: data.secure_url }));
-          }
-        });
-    }
-  };
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement> | DragEvent<HTMLDivElement> | File) => {
-    const file = (e instanceof File)
-      ? e
-      : 'dataTransfer' in e && e.dataTransfer?.files?.[0]
-        ? e.dataTransfer.files[0]
-        : 'target' in e && (e.target as HTMLInputElement).files?.[0]
-          ? (e.target as HTMLInputElement).files![0]
-          : undefined;
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-      fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: formData,
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.secure_url) {
-            setForm(f => ({ ...f, cover_image_url: data.secure_url }));
-          }
-        });
-    }
-  };
-
   if (!open) return null;
 
   // Progress indicator
@@ -195,6 +85,56 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
   // Step validation
   const canGoNext1 = form.name.trim().length > 0;
   const canGoNext2 = true; // No required fields on media step
+
+  const handleLogoChange = async (file: File) => {
+    setLogoError(null);
+    try {
+      await uploadLogo(file);
+    } catch {
+      setLogoError('Failed to upload logo. Please try again.');
+    }
+  };
+
+  const uploadLogo = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.secure_url) {
+      setForm(prev => ({ ...prev, logo_url: data.secure_url }));
+    } else {
+      throw new Error('No URL returned');
+    }
+  };
+
+  const handleCoverChange = async (file: File) => {
+    setCoverError(null);
+    try {
+      await uploadCover(file);
+    } catch {
+      setCoverError('Failed to upload cover image. Please try again.');
+    }
+  };
+
+  const uploadCover = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.secure_url) {
+      setForm(prev => ({ ...prev, cover_image_url: data.secure_url }));
+    } else {
+      throw new Error('No URL returned');
+    }
+  };
 
   return (
     <PremiumModal isOpen={open} onClose={onClose}>
@@ -216,10 +156,8 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
             } else if (step === 3) {
               setSubmitting(true);
               try {
-                // Remove legacy phone/email fields if present
-                const { phone, email, ...rest } = form;
                 // Save restaurant and get ID
-                const saved = await onSave(rest as RestaurantData);
+                const saved = await onSave(form as RestaurantData);
                 if (saved && saved.id) {
                   setForm(f => ({ ...f, id: saved.id }));
                   onClose();
@@ -271,6 +209,12 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
                   value={form.logo_url || ''}
                   onChange={handleLogoChange}
                 />
+                {logoUploading && (
+                  <div className="text-xs text-gray-500 mt-1">Uploading logo...</div>
+                )}
+                {logoError && (
+                  <div className="text-xs text-red-500 mt-1">{logoError}</div>
+                )}
               </div>
               <div className="form-block-spacing">
                 <label className="text-sm font-medium text-gray-700 mb-1">Header Image</label>
@@ -279,6 +223,12 @@ export default function RestaurantModal({ open, onClose, onSave, initialData, mo
                   value={form.cover_image_url || ''}
                   onChange={handleCoverChange}
                 />
+                {coverUploading && (
+                  <div className="text-xs text-gray-500 mt-1">Uploading cover image...</div>
+                )}
+                {coverError && (
+                  <div className="text-xs text-red-500 mt-1">{coverError}</div>
+                )}
               </div>
               <div className="flex justify-between mt-2">
                 <PremiumButton type="button" variant="secondary" onClick={() => setStep(1)}>

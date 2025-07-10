@@ -4,7 +4,6 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const PremiumAuthForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   return (
     <form className="p-6 border rounded-2xl shadow-lg bg-white w-full max-w-xs mx-auto">
       <div className="relative mb-6">
@@ -35,7 +34,6 @@ const PremiumAuthForm = () => {
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
-      {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
       <button className="btn-primary w-full mt-2 py-3 rounded-lg shadow hover:scale-105 transition-transform" type="submit">Sign In</button>
     </form>
   );

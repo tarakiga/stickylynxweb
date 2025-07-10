@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Trash2, PlusCircle, Eye, EyeOff } from 'lucide-react';
+import { Pencil, Trash2, PlusCircle, Eye } from 'lucide-react';
 import Image from 'next/image';
 
 export interface PremiumCardListProps {
@@ -11,9 +11,10 @@ export interface PremiumCardListProps {
   createLabel?: string;
   onView?: () => void;
   onPreview?: () => void;
+  extraActions?: React.ReactNode;
 }
 
-const PremiumCardList: React.FC<PremiumCardListProps> = ({ logo, name, onEdit, onDelete, onCreate, createLabel, onView }) => (
+const PremiumCardList: React.FC<PremiumCardListProps> = ({ logo, name, onEdit, onDelete, onCreate, createLabel, onView, extraActions }) => (
   <div className="flex items-center gap-4 bg-white rounded-2xl shadow-lg border border-gray-100 px-6 py-4 hover:shadow-2xl transition-shadow duration-200 w-full">
     <Image src={logo} alt="logo" width={56} height={56} className="w-14 h-14 rounded-xl object-cover shadow-sm bg-gray-100" />
     <span className="font-semibold text-lg flex-1 text-gray-900 ml-2">{name}</span>
@@ -31,6 +32,7 @@ const PremiumCardList: React.FC<PremiumCardListProps> = ({ logo, name, onEdit, o
           {createLabel ? <span>{createLabel}</span> : null}
         </button>
       )}
+      {extraActions}
     </div>
   </div>
 );

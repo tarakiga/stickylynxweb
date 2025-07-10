@@ -18,6 +18,7 @@ export const restaurants = pgTable("restaurants", {
   id: serial("id").primaryKey(),
   user_id: text("user_id").references(() => users.id),
   name: varchar("name", { length: 255 }),
+  slug: varchar("slug", { length: 64 }).unique(),
   description: text("description"),
   address: text("address"),
   website: varchar("website", { length: 255 }),

@@ -3,10 +3,12 @@ import { db } from '@/lib/db';
 import { Resend } from 'resend';
 import { passwordResetTokens } from '@/lib/schema';
 import crypto from 'crypto';
+import fs from 'fs/promises';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
+  console.log('[Request Password Reset] API called');
   try {
     const { email } = await req.json();
     if (!email) {
@@ -27,16 +29,26 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       expiresAt,
     });
-    // Send email
+    // Send email with Maizzle template
     const resetUrl = `${process.env.NEXTAUTH_URL || 'https://stickylynx.online'}/reset-password?token=${token}`;
+    let html = '';
+    try {
+      html = await fs.readFile('maizzle/build_production/password-reset.html', 'utf8');
+      console.log('[Request Password Reset] Loaded HTML:', html.slice(0, 200));
+    } catch (fileErr) {
+      console.error('[Request Password Reset] Error reading Maizzle template:', fileErr);
+      return NextResponse.json({ error: 'Failed to load email template' }, { status: 500 });
+    }
+    html = html.replace(/{{\s*resetUrl\s*}}/g, resetUrl);
     await resend.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
       to: email,
       subject: 'Password Reset Request',
-      html: `<h1>Password Reset</h1><p>Click the link below to reset your password. This link will expire in 1 hour.</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+      html
     });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error('[Request Password Reset] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

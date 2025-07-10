@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   as?: 'button';
@@ -27,7 +27,6 @@ export const PremiumButton: React.FC<PremiumButtonProps> = (props) => {
     variant = 'primary',
     icon,
     loading = false,
-    as = 'button',
     ...rest
   } = props;
 
@@ -44,7 +43,7 @@ export const PremiumButton: React.FC<PremiumButtonProps> = (props) => {
   const state =
     ('disabled' in props && props.disabled) || loading
       ? 'opacity-60 cursor-not-allowed pointer-events-none'
-      : 'cursor-pointer hover:scale-105 active:scale-95';
+      : 'cursor-pointer hover:cursor-pointer hover:scale-105 active:scale-95';
 
   if (isAnchorProps(props)) {
     // Anchor

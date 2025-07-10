@@ -3,7 +3,16 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { db } from "@/lib/db";
 import { restaurants, restaurant_phones, restaurant_emails, menu_categories, menu_items } from "@/lib/schema";
-import { eq, and, sql, inArray } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
+
+// Add a simple slugify utility
+function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '')
+    .substring(0, 64);
+}
 
 export async function GET() {
   try {
@@ -74,8 +83,16 @@ export async function POST(req: NextRequest) {
     const userId = userRecord.id;
     const body = await req.json();
     const { phones, emails, ...rest } = body;
+    // Slug generation
+    const baseSlug = slugify(rest.name || 'restaurant');
+    let slug = baseSlug;
+    let i = 1;
+    // Ensure uniqueness
+    while (await db.query.restaurants.findFirst({ where: (r, { eq }) => eq(r.slug, slug) })) {
+      slug = `${baseSlug}-${i++}`;
+    }
     // Insert restaurant
-    const [restaurant] = await db.insert(restaurants).values({ ...rest, user_id: userId }).returning();
+    const [restaurant] = await db.insert(restaurants).values({ ...rest, user_id: userId, slug }).returning();
     // Insert phones/emails
     if (phones && Array.isArray(phones)) {
       await Promise.all(phones.map((phone: string) => db.insert(restaurant_phones).values({ restaurant_id: restaurant.id, phone })));
@@ -106,6 +123,9 @@ export async function PATCH(req: NextRequest) {
     const userId = userRecord.id;
     const body = await req.json();
     const { id, phones, emails, ...update } = body;
+    // Remove any timestamp fields from update
+    delete update.created_at;
+    delete update.updated_at;
     // Update restaurant
     await db.update(restaurants).set(update).where(and(eq(restaurants.id, id), eq(restaurants.user_id, userId)));
     // Replace phones

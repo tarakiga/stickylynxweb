@@ -1,12 +1,11 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import PremiumButton from '../../../components/PremiumButton';
-import PremiumModal from '../../../components/PremiumModal';
 import PremiumInput from '../../../components/PremiumInput';
 import PremiumTextArea from '../../../components/PremiumTextArea';
-import FieldRepeater from '../../../components/FieldRepeater';
 import BottomDrawer from "./BottomDrawer";
 import { Check, X, Pencil, Trash2 } from 'lucide-react';
+import PremiumModal from '../../../components/PremiumModal';
 
 // Types for menu builder
 export interface MenuItemPrice {
@@ -27,9 +26,10 @@ export interface MenuCategory {
   name: string;
   description?: string;
   restaurant_id?: number;
+  isPending?: boolean;
 }
 
-function AddCategoryStepperModal({ isOpen, onClose, onSave, restaurantId, onCategorySaved }: { isOpen: boolean, onClose: () => void, onSave: (cat: MenuCategory, items: MenuItem[]) => void, restaurantId: number, onCategorySaved?: () => void }) {
+function AddCategoryStepperModal({ isOpen, onClose, onSave, onCategorySaved }: { isOpen: boolean, onClose: () => void, onSave: (cat: MenuCategory, items: MenuItem[]) => void, onCategorySaved?: () => void }) {
   const [categoryName, setCategoryName] = useState('');
   const [categoryDesc, setCategoryDesc] = useState('');
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -194,13 +194,14 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [editingCatId, setEditingCatId] = useState<number | null>(null);
   const [tempCatName, setTempCatName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  // Removed unused setOptimisticCategories and setAddCatError
+  const [deleteModal, setDeleteModal] = useState<{ type: 'category' | 'item'; id: number; name: string; itemCount?: number } | null>(null);
 
   // Fetch categories and items
-  const refetchMenuData = () => {
+  const refetchMenuData = useCallback(() => {
     if (!restaurantId) return;
     setLoading(true);
     Promise.all([
@@ -214,83 +215,20 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
       })
       .catch(() => setError("Failed to fetch menu data"))
       .finally(() => setLoading(false));
-  };
+  }, [restaurantId]);
 
   useEffect(() => {
     refetchMenuData();
-  }, [restaurantId]);
+  }, [restaurantId, refetchMenuData]);
 
   // Filter items by category
   const getItemsForCategory = (catId: number) => items.filter((i) => i.category_id === catId);
 
-  // Delete Category
-  const handleCatDelete = async (catId: number) => {
-    if (!window.confirm('Delete this category and all its items?')) return;
-    await fetch('/api/menu-categories', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: catId }),
-    });
-    setCategories(cats => cats.filter(c => c.id !== catId));
-    setItems(items => items.filter(i => i.category_id !== catId));
-  };
-
   // Delete Item
-  const handleItemDelete = async (itemId: number) => {
-    if (!window.confirm('Delete this item?')) return;
-    await fetch('/api/menu-items', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: itemId }),
-    });
-    setItems(items => items.filter(i => i.id !== itemId));
-  };
-
-  // Add/Edit Category (with validation)
-  const handleCatSave = async (cat: MenuCategory, items: MenuItem[]) => {
-    setSaveError(null);
-    try {
-      // Save category first
-      const res = await fetch('/api/menu-categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...cat, restaurant_id: restaurantId }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        setSaveError(err.error || 'Failed to save category');
-        console.error('Category save error:', err);
-        return;
-      }
-      const savedCat = await res.json();
-      // Save items for this category
-      for (const item of items) {
-        // Sanitize prices: ensure price is a number
-        const sanitizedPrices = (item.prices || []).map((p: MenuItemPrice) => ({
-          label: p.label,
-          price: Number(p.price),
-        }));
-        const itemRes = await fetch('/api/menu-items', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...item, prices: sanitizedPrices, category_id: savedCat.id }),
-        });
-        if (!itemRes.ok) {
-          const err = await itemRes.json();
-          setSaveError(err.error || 'Failed to save item');
-          console.error('Item save error:', err);
-          return;
-        }
-      }
-      // Refetch categories and items
-      const cats = await fetch(`/api/menu-categories?restaurant_id=${restaurantId}`).then(r => r.json());
-      setCategories(Array.isArray(cats) ? cats : []);
-      const its = await fetch(`/api/menu-items`).then(r => r.json());
-      setItems(Array.isArray(its) ? its : []);
-    } catch (err) {
-      setSaveError('Unexpected error saving category or items');
-      console.error('Unexpected save error:', err);
-    }
+  const handleItemDelete = (itemId: number) => {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    setDeleteModal({ type: 'item', id: itemId, name: item.name });
   };
 
   // Inline edit save handler
@@ -309,18 +247,59 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
     refetchMenuData();
   };
 
+  // Optimistic add category handler
+  // Removed handleOptimisticAddCategory as it is unused
+
+  const handleCategoryDelete = (catId: number) => {
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    const itemCount = items.filter(i => i.category_id === catId).length;
+    setDeleteModal({ type: 'category', id: catId, name: cat.name, itemCount });
+  };
+  const confirmDelete = async () => {
+    if (!deleteModal) return;
+    if (deleteModal.type === 'category') {
+      await fetch('/api/menu-categories', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: deleteModal.id }),
+      });
+      setCategories(prev => prev.filter(c => c.id !== deleteModal.id));
+      setItems(prev => prev.filter(i => i.category_id !== deleteModal.id));
+    } else if (deleteModal.type === 'item') {
+      await fetch('/api/menu-items', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: deleteModal.id }),
+      });
+      setItems(prev => prev.filter(i => i.id !== deleteModal.id));
+    }
+    setDeleteModal(null);
+  };
+  const cancelDelete = () => setDeleteModal(null);
+
   return (
     <section className="flex flex-col h-full min-h-0">
       <h3 className="text-lg font-semibold mb-4">Menu Builder</h3>
-      {saveError && <div className="text-red-600 mb-2">{saveError}</div>}
       <div className="flex-1 min-h-0 flex flex-col">
         <div className="flex-1 min-h-0 overflow-y-auto pr-2">
-          {loading && <div className="text-gray-500">Loading menu...</div>}
-          {error && <div className="text-red-600">{error}</div>}
-          {!loading && !error && (
+          {loading && categories.length === 0 ? (
+            <div className="flex flex-col items-center gap-4">
+              <PremiumButton variant="primary" onClick={onAddCategory} disabled={loading}>
+                + Add Category
+                <span className="ml-2 animate-spin">{/* spinner icon here if desired */}</span>
+              </PremiumButton>
+              <div className="text-gray-400 text-sm">Loading menu...</div>
+            </div>
+          ) : loading ? (
+            <div className="text-gray-500">Loading menu...</div>
+          ) : error ? (
+            <div className="text-red-600">{error}</div>
+          ) : (
             <div className="space-y-6">
-              {categories.map(cat => (
-                <div key={cat.id} className="bg-white rounded-xl shadow p-4">
+              {categories.map((cat: MenuCategory) => (
+                <div key={cat.id} className="bg-white rounded-xl shadow p-4 opacity-100 relative border border-black">
+                  {/* Removed isPending UI as optimisticCategories is not used */}
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2 min-w-0">
                       {editingCatId === cat.id ? (
@@ -364,6 +343,17 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                           >
                             <Pencil size={18} className="text-yellow-600" />
                           </button>
+                          {/* Delete button for category */}
+                          {!cat.isPending && (
+                            <button
+                              type="button"
+                              aria-label="Delete category"
+                              className="p-1 rounded hover:bg-red-100 transition"
+                              onClick={() => handleCategoryDelete(cat.id ?? -1)}
+                            >
+                              <Trash2 size={18} className="text-red-500" />
+                            </button>
+                          )}
                         </>
                       )}
                     </div>
@@ -374,7 +364,7 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
                       <div key={item.id ?? Math.random()} className="bg-gray-50 rounded p-3 flex justify-between items-center">
                         <div>
                           <div className="font-medium text-gray-900">{item.name}</div>
-                          <div className="text-xs text-gray-500">{item.description}</div>
+                          <div className="text-xs text-gray-500 whitespace-normal break-words w-full min-w-0">{item.description}</div>
                           {item.prices && item.prices.length > 0 && (
                             <div className="flex gap-2 mt-1">
                               {item.prices.map((p: MenuItemPrice, idx: number) => (
@@ -412,6 +402,31 @@ export default function MenuBuilder({ restaurantId, onAddCategory, onAddItem, on
           )}
         </div>
       </div>
+      {/* Delete Modal */}
+      {deleteModal && (
+        <PremiumModal isOpen={!!deleteModal} onClose={cancelDelete}>
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="mb-4 text-red-600">
+              <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M15 9h.01M9 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">
+              Delete {deleteModal.type === 'category' ? `category "${deleteModal.name}"` : `item "${deleteModal.name}"`}?
+            </h2>
+            <p className="mb-2 text-gray-600">This action <span className="text-red-600 font-semibold">cannot be undone</span>.</p>
+            {deleteModal.type === 'category' && (
+              <div className="mb-2 text-gray-600">Deleting this category will also delete:
+                <ul className="mb-4 text-gray-700 text-sm list-disc list-inside">
+                  <li><span className="font-semibold">{deleteModal.itemCount}</span> menu item{deleteModal.itemCount === 1 ? '' : 's'}</li>
+                </ul>
+              </div>
+            )}
+            <div className="flex gap-4 justify-center">
+              <PremiumButton variant="secondary" onClick={cancelDelete}>Cancel</PremiumButton>
+              <PremiumButton variant="danger" onClick={confirmDelete}>Delete Permanently</PremiumButton>
+            </div>
+          </div>
+        </PremiumModal>
+      )}
     </section>
   );
 }

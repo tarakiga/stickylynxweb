@@ -2,13 +2,14 @@
 import { useEffect, useState } from "react";
 import RestaurantModal from "./RestaurantModal";
 import PremiumButton from '../../../components/PremiumButton';
-import { Pencil, Trash2 } from 'lucide-react';
 import CategoryCard from '@/components/CategoryCard';
 import PremiumModal from '@/components/PremiumModal';
 import MenuBuilder, { AddCategoryStepperModal } from './MenuBuilder';
 import BottomDrawer from "./BottomDrawer";
 import PremiumCardList from '../../../components/PremiumCardList';
 import MenuItemForm from '../../../components/MenuItemForm';
+import { Link as LinkIcon, QrCode } from 'lucide-react';
+import { QRCodeCanvas as QRCode } from 'qrcode.react';
 
 export interface Restaurant {
   id: number;
@@ -21,6 +22,7 @@ export interface Restaurant {
   opening_hours?: unknown;
   logo_url?: string;
   cover_image_url?: string;
+  slug?: string; // Added slug for preview
 }
 
 // Types for menu items and categories
@@ -44,30 +46,6 @@ export interface MenuCategory {
   restaurant_id?: number;
 }
 
-const PremiumCard = ({ header, logoUrl, children }: { header: string; logoUrl?: string; children: React.ReactNode }) => (
-  <div className="card rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-shadow duration-200 bg-white">
-    <div
-      className="card-header flex items-center gap-3 text-white rounded-t-2xl p-4"
-      style={{ background: 'var(--blue-munsell)' }}
-    >
-      {logoUrl ? (
-        <img
-          src={logoUrl}
-          alt="Logo"
-          className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm bg-white"
-          style={{ minWidth: 36, minHeight: 36 }}
-        />
-      ) : (
-        <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white shadow-sm" style={{ minWidth: 36, minHeight: 36 }}>
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#b0b0b0"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path d="M8 15c1.333-1 4.667-1 6 0" strokeWidth="2" strokeLinecap="round" /><circle cx="12" cy="10" r="3" strokeWidth="2" /></svg>
-        </div>
-      )}
-      <span className="font-semibold text-lg">{header}</span>
-    </div>
-    <div className="card-body p-6 text-gray-800">{children}</div>
-  </div>
-);
-
 export default function RestaurantList() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,6 +65,9 @@ export default function RestaurantList() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Restaurant | null>(null);
   const [deleteCounts, setDeleteCounts] = useState<{ categories: number; items: number }>({ categories: 0, items: 0 });
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [qrSlug, setQrSlug] = useState<string | null>(null);
 
   const categories = [
     {
@@ -170,8 +151,16 @@ export default function RestaurantList() {
         body: JSON.stringify(modalMode === "edit" ? { ...data, id: editData?.id } : data),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to save");
-      const saved = await res.json(); // get the saved restaurant with id
+      let saved;
+      try {
+        saved = await res.json();
+      } catch {
+        saved = null;
+      }
+      if (!res.ok || !saved || saved.error) {
+        setError(saved?.error || "Failed to save");
+        return undefined;
+      }
       // Refetch
       const updated = await fetch("/api/restaurants", { credentials: "include" }).then(r => r.json());
       setRestaurants(updated);
@@ -297,6 +286,10 @@ export default function RestaurantList() {
     setModalOpen(true);
   }
 
+  function handleView(restaurant: Restaurant) {
+    if (restaurant.slug) setPreviewSlug(restaurant.slug);
+  }
+
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
@@ -318,22 +311,64 @@ export default function RestaurantList() {
         </PremiumButton>
       </div>
       {loading && <div className="text-gray-500">Loading...</div>}
-      {error && <div className="text-red-600">{error}</div>}
+      {error && (
+        <PremiumModal isOpen={!!error} onClose={() => setError(null)}>
+          <div className="flex flex-col items-center text-center p-6">
+            <div className="mb-4 text-red-600">
+              <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M15 9h.01M9 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">Failed to Save</h2>
+            <p className="mb-4 text-gray-600">{error}</p>
+            <button
+              className="px-6 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition"
+              onClick={() => setError(null)}
+            >
+              Close
+            </button>
+          </div>
+        </PremiumModal>
+      )}
       {!loading && !error && (
         <div className="flex flex-col gap-4 w-full">
           {restaurants.map((restaurant: Restaurant) => {
             const hasMenu = menuStatus[restaurant.id];
             return (
-              <PremiumCardList
-                key={restaurant.id}
-                logo={restaurant.logo_url || '/assets/images/foodMenu.png'}
-                name={restaurant.name}
-                onEdit={() => handleEdit(restaurant)}
-                onDelete={() => handleDelete(restaurant.id)}
-                onCreate={() => handleCreateMenu(restaurant)}
-                createLabel={hasMenu ? 'Edit Menu' : '+ Add Menu'}
-                onView={hasMenu ? () => handleView(restaurant) : undefined}
-              />
+              <div className="relative" key={restaurant.id}>
+                <PremiumCardList
+                  logo={restaurant.logo_url || '/assets/images/foodMenu.png'}
+                  name={restaurant.name}
+                  onEdit={() => handleEdit(restaurant)}
+                  onDelete={() => handleDelete(restaurant.id)}
+                  onCreate={() => handleCreateMenu(restaurant)}
+                  createLabel={hasMenu ? 'Edit Menu' : '+ Add Menu'}
+                  onView={hasMenu ? () => handleView(restaurant) : undefined}
+                  extraActions={hasMenu && restaurant.slug ? (
+                    <>
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-100 transition ml-2"
+                        title="Show QR code"
+                        onClick={() => setQrSlug(restaurant.slug!)}
+                      >
+                        <QrCode size={20} />
+                      </button>
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-100 transition ml-2"
+                        title="Copy menu link"
+                        onClick={async () => {
+                          await navigator.clipboard.writeText(`${window.location.origin}/menu/${restaurant.slug}`);
+                          setCopiedSlug(restaurant.slug ? restaurant.slug : null);
+                          setTimeout(() => setCopiedSlug(null), 1500);
+                        }}
+                      >
+                        <LinkIcon size={20} />
+                      </button>
+                      {copiedSlug === restaurant.slug && (
+                        <span className="ml-2 bg-black text-white text-xs rounded px-2 py-1 shadow">Link copied!</span>
+                      )}
+                    </>
+                  ) : undefined}
+                />
+              </div>
             );
           })}
         </div>
@@ -420,7 +455,6 @@ export default function RestaurantList() {
               setCategoryModalRestaurantId(null);
               setMenuModalOpen(true);
             }}
-            restaurantId={categoryModalRestaurantId}
             onSave={handleCatSave}
             onCategorySaved={refetchMenuData}
           />
@@ -465,7 +499,7 @@ export default function RestaurantList() {
             <div className="mb-4 text-red-600">
               <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M15 9h.01M9 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            <h2 className="text-xl font-bold mb-2">Delete "{pendingDelete.name}"?</h2>
+            <h2 className="text-xl font-bold mb-2">Delete &quot;{pendingDelete.name}&quot;?</h2>
             <p className="mb-2 text-gray-600">This action <span className="text-red-600 font-semibold">cannot be undone</span>.</p>
             <p className="mb-2 text-gray-600">Deleting this Lynx will also delete:</p>
             <ul className="mb-6 text-gray-700 text-sm list-disc list-inside">
@@ -489,9 +523,34 @@ export default function RestaurantList() {
           </div>
         </PremiumModal>
       )}
+      {/* Frontend Preview Modal */}
+      {previewSlug && (
+        <PremiumModal isOpen={!!previewSlug} onClose={() => setPreviewSlug(null)}>
+          <div className="w-full max-w-3xl h-[80vh] flex flex-col">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-semibold text-lg">Frontend Preview</span>
+              <button className="text-gray-500 hover:text-gray-800" onClick={() => setPreviewSlug(null)}>Close</button>
+            </div>
+            <iframe
+              src={`/menu/${previewSlug}`}
+              className="flex-1 w-full rounded-xl border"
+              style={{ minHeight: 400 }}
+              title="Frontend Preview"
+            />
+          </div>
+        </PremiumModal>
+      )}
+      {/* QR Code Modal */}
+      {qrSlug && (
+        <PremiumModal isOpen={!!qrSlug} onClose={() => setQrSlug(null)}>
+          <div className="flex flex-col items-center justify-center p-6">
+            <h2 className="text-lg font-semibold mb-4">Scan to view menu</h2>
+            <QRCode value={`${window.location.origin}/menu/${qrSlug}`} size={200} />
+            <div className="mt-4 text-gray-500 text-sm">{window.location.origin}/menu/{qrSlug}</div>
+            <button className="mt-6 px-6 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition" onClick={() => setQrSlug(null)}>Close</button>
+          </div>
+        </PremiumModal>
+      )}
     </section>
   );
-}
-
-function handleView(restaurant: Restaurant) { alert('View ' + restaurant.name); }
-function handlePreview(restaurant: Restaurant) { alert('Preview ' + restaurant.name); } 
+} 

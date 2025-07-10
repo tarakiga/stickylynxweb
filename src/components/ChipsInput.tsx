@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import PremiumInput from './PremiumInput';
 
 interface ChipsInputProps {
   label: string;

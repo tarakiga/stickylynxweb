@@ -200,3 +200,69 @@
   - If new remote image domains are used in the future, add them to `images.domains` for compatibility.
 
 ---
+
+## Progress Update – [2024-06-10]
+
+### Lint & Build Cleanup
+
+- Removed all unused variables/imports in flagged files (MenuBuilder.tsx, RestaurantModal.tsx, PremiumButton.tsx, etc.)
+- Escaped unescaped quotes in privacy-policy/page.tsx
+- Addressed React hook dependency warnings
+- Added TODO for Next.js font loading best practices in layout.tsx
+- Ran ESLint autofix and manual cleanup across the codebase
+
+### Outstanding Issues
+
+- Unescaped quotes remain in:
+  - src/app/dashboard/components/RestaurantList.tsx (line 443)
+  - src/stories/Page.tsx (line 39)
+- Next.js font warning: custom fonts should be loaded in \_document.js
+- Lint errors in .next/types are auto-generated and can be ignored or excluded from linting
+
+### Next Steps (for tomorrow)
+
+- Manually escape unescaped quotes in RestaurantList.tsx and stories/Page.tsx
+- (Optional) Move custom font loading to \_document.js
+- Exclude .next/types from ESLint config for a clean lint run
+
+---
+
+## [2024-06-XX] Optimistic UI & Immediate CTA for Async Loading
+
+- **Optimistic UI for Add Category:**
+  - When adding a new menu category, the UI now instantly displays the new category with a 'Saving…' indicator, replacing it with the real data on backend success or rolling back on failure.
+  - This eliminates unnecessary loading delays and provides instant feedback for a premium experience.
+
+- **Immediate CTA on Empty State:**
+  - When there are no categories (empty state), the 'Add Category' button is shown immediately—even while loading—so users always see a clear call-to-action.
+  - This pattern should be applied to other async/empty state cases (e.g., item add, user invites) for best-in-class UX.
+
+---
+
+## [2024-05-11] MenuBuilder UX & Bug Fixes (AI assistant)
+
+- Added premium confirmation modal for deleting categories and items, matching dashboard restaurant delete UX.
+- Modal now shows context (name, cascade info), and uses PremiumModal and PremiumButton.
+- Fixed invalid HTML (ul inside p) in modal to prevent hydration errors.
+- Fixed menu item description text overflow: added wrapping and flex fixes so long descriptions never spill out.
+
+---
+
+# Workplan Progress Update (2024-06-09)
+
+## QR Code Runtime Error & Resolution
+- **Issue:** Runtime error with `qrcode.react` (`Element type is invalid: expected a string or a class/function but got: undefined`) when using React 19.1.0.
+- **Root Cause:** `qrcode.react@4.2.0` is not compatible with React 19.x. The package was released before React 19 and does not support the new JSX runtime and changes introduced in React 19.
+- **Troubleshooting Steps:**
+  - Verified correct import: `import QRCode from 'qrcode.react';`
+  - Confirmed only one React version installed (`19.1.0`).
+  - Performed clean install (`pnpm install` after removing `node_modules` and lockfile).
+  - Confirmed the error persisted.
+- **Solution Options:**
+  1. **Downgrade React to 18.2.0** (fully supported by `qrcode.react`).
+  2. **Switch to a React 19-compatible QR code library** (e.g., `react-qr-code`).
+- **Recommendation:**
+  - For fastest resolution, downgrade to React 18.2.0.
+  - If React 19 is required, migrate to `react-qr-code` and update component usage accordingly.
+
+---
