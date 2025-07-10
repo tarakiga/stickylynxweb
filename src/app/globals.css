@@ -10,6 +10,11 @@
   --blue-munsell: #62929eff;
 }
 
+html, body {
+  font-family: 'Asap', Arial, Helvetica, sans-serif!important;
+}
+    
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
