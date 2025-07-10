@@ -2,7 +2,13 @@
 import { useState } from "react";
 import { Share2, Copy, Facebook, Twitter, Globe, MessageCircle, Link } from "lucide-react";
 
-const shareOptions = [
+type ShareAction = ((url: string, setCopied: (v: boolean) => void) => void) | ((url: string) => void);
+
+const shareOptions: Array<{
+  label: string;
+  icon: any;
+  action: ShareAction;
+}> = [
   {
     label: "Copy link",
     icon: Copy,
@@ -15,28 +21,28 @@ const shareOptions = [
   {
     label: "Share on X",
     icon: Twitter,
-    action: (url: string, _: (v: boolean) => void) => {
+    action: (url: string) => {
       window.open(`https://x.com/intent/tweet?url=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on Facebook",
     icon: Facebook,
-    action: (url: string, _: (v: boolean) => void) => {
+    action: (url: string) => {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on Reddit",
     icon: Globe, // fallback icon
-    action: (url: string, _: (v: boolean) => void) => {
+    action: (url: string) => {
       window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on WhatsApp",
     icon: MessageCircle,
-    action: (url: string, _: (v: boolean) => void) => {
+    action: (url: string) => {
       window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, "_blank");
     },
   },
@@ -67,7 +73,11 @@ export default function ShareButton({ iconClassName = '', iconType = 'share' }: 
               className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50 hover:text-blue-700 text-sm text-left"
               onClick={async () => {
                 setOpen(false);
-                await opt.action(url, setCopied);
+                if (opt.label === "Copy link") {
+                  await (opt.action as (url: string, setCopied: (v: boolean) => void) => void)(url, setCopied);
+                } else {
+                  (opt.action as (url: string) => void)(url);
+                }
               }}
               type="button"
             >
