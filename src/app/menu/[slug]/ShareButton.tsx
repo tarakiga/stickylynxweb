@@ -15,28 +15,28 @@ const shareOptions = [
   {
     label: "Share on X",
     icon: Twitter,
-    action: (url: string) => {
+    action: (url: string, _setCopied: (v: boolean) => void) => {
       window.open(`https://x.com/intent/tweet?url=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on Facebook",
     icon: Facebook,
-    action: (url: string) => {
+    action: (url: string, _setCopied: (v: boolean) => void) => {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on Reddit",
     icon: Globe, // fallback icon
-    action: (url: string) => {
+    action: (url: string, _setCopied: (v: boolean) => void) => {
       window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on WhatsApp",
     icon: MessageCircle,
-    action: (url: string) => {
+    action: (url: string, _setCopied: (v: boolean) => void) => {
       window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, "_blank");
     },
   },
@@ -67,11 +67,7 @@ export default function ShareButton({ iconClassName = '', iconType = 'share' }: 
               className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50 hover:text-blue-700 text-sm text-left"
               onClick={async () => {
                 setOpen(false);
-                if (opt.label === "Copy link") {
-                  await opt.action(url, setCopied);
-                } else {
-                  opt.action(url);
-                }
+                await opt.action(url, setCopied);
               }}
               type="button"
             >
