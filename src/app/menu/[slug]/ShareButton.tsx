@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { Share2, Copy, Facebook, Twitter, Globe, MessageCircle, Link } from "lucide-react";
+import type { ComponentType } from "react";
 
 type ShareAction = ((url: string, setCopied: (v: boolean) => void) => void) | ((url: string) => void);
 
+type IconType = ComponentType<{ size?: number; className?: string }>;
 const shareOptions: Array<{
   label: string;
-  icon: any;
+  icon: IconType;
   action: ShareAction;
 }> = [
   {
