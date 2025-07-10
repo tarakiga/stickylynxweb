@@ -86,8 +86,9 @@ async function getRestaurantBySlug(slug: string) {
   return { ...restaurant, phones, emails, categories: categoriesWithItems };
 }
 
-export default async function MenuPage({ params }: { params: { slug: string } }) {
-  const data = await getRestaurantBySlug(params.slug);
+export default async function MenuPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const data = await getRestaurantBySlug(slug);
   if (!data) return notFound();
   const { name, logo_url, description, website: rawWebsite, phones, emails, categories } = data;
   const website = rawWebsite ?? '';
