@@ -19,7 +19,7 @@ export const Default: Story = {
         label="Email"
         value={fields}
         onChange={setFields}
-        inputProps={{ type: 'email', placeholder: 'Enter email' }}
+        inputProps={{ type: 'email', placeholder: 'Enter email', label: 'Email' }}
       />
     );
   },
