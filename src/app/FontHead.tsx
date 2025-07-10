@@ -1,3 +1,4 @@
+// eslint-disable-next-line @next/next/no-page-custom-font
 import Head from 'next/head';
 
 export default function FontHead() {

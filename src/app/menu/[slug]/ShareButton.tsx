@@ -15,28 +15,28 @@ const shareOptions = [
   {
     label: "Share on X",
     icon: Twitter,
-    action: (url: string, _setCopied: (v: boolean) => void) => {
+    action: (url: string, _: (v: boolean) => void) => {
       window.open(`https://x.com/intent/tweet?url=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on Facebook",
     icon: Facebook,
-    action: (url: string, _setCopied: (v: boolean) => void) => {
+    action: (url: string, _: (v: boolean) => void) => {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on Reddit",
     icon: Globe, // fallback icon
-    action: (url: string, _setCopied: (v: boolean) => void) => {
+    action: (url: string, _: (v: boolean) => void) => {
       window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(url)}`, "_blank");
     },
   },
   {
     label: "Share on WhatsApp",
     icon: MessageCircle,
-    action: (url: string, _setCopied: (v: boolean) => void) => {
+    action: (url: string, _: (v: boolean) => void) => {
       window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, "_blank");
     },
   },
