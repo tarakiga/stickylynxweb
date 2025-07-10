@@ -17,6 +17,7 @@
     "@react-firebase/auth": "^0.2.10",
     "@vercel/postgres": "^0.10.0",
     "bcryptjs": "^3.0.2",
+    "caniuse-lite": "^1.0.30001727",
     "drizzle-orm": "^0.44.2",
     "framer-motion": "^12.23.1",
     "next": "15.3.5",
